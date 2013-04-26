@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Jumpman - Jump the box!!!</title>
+<style>
+    body, html
+    {
+        margin: 0px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+</style>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+
+    void main(void)
+    {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vColor = aVertexColor;
+    }
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+    precision mediump float;
+    
+    varying vec4 vColor;
+
+    void main(void)
+    {
+        gl_FragColor = vColor;
+    }
+</script>
+
+<script id="shader-vs-texture" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+    
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    
+    varying vec2 vTextureCoord;
+    
+    void main(void)
+    {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoord = aTextureCoord;
+    }
+</script>
+
+<script id="shader-fs-texture" type="x-shader/x-fragment">
+    precision mediump float;
+
+    varying vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+
+    void main(void)
+    {
+        gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+    }
+</script>
+
+<!-- Library -->
+<!-- script type="text/javascript" src="./library/glMatrix-0.9.5.min.js"></script -->
+<script type="text/javascript" src="./library/gl-matrix-2.2.0-7.js"></script>
+<script type="text/javascript" src="./library/common/webgl-utils.js"></script>
+
+<!-- Library -->
+<script type="text/javascript" src="./CookieGLEngine.js"></script>
+<script type="text/javascript" src="./SceneEngine.js"></script>
+<script type="text/javascript" src="./Scene.js"></script>
+<script type="text/javascript" src="./Jumpman.js"></script>
+<script type="text/javascript" src="./JumperModel.js"></script>
+
+<!-- Leap support -->
+<script type="text/javascript" src="leap.js"></script>
+<script type="text/javascript" src="LeapHelper.js"></script>
+
+<!-- Main program -->
+<script type="text/javascript">
+    var game;
+    var start = function()
+    {
+        game = new JumpmanGame();
+        game.run();
+    }
+</script>
+
+</head>
+
+<body onload="start()">
+    <table>
+        <tr>
+            <th>
+                <canvas id="main_canvas" width="640" height="480" style="border: none;">
+                    If you're seeing this your web browser doesn't support the &lt;canvas&gt; element. Ouch!
+                </canvas>
+            </th>
+            <th valign="top" align="left">
+                <br />
+                Cursor key<br />
+                Space and Up: Jump<br />
+                Left and Right: Move<br />
+                P: Pause (It is fake pause for now)<br />
+                <div id="deadCounter">Dead count: 0</div><br />
+                <div id="roundCounter">Total Round: 0</div><br />
+            </th>
+            <th valign="top">
+                <div id="frameData"></div>
+                <div id="handData"></div>
+            </th>
+        </tr>
+        <tr>
+            <input type='checkbox' onchange='enableLeap(this)'>Enable Leap
+        </tr>
+    </table>
+</body>
+
